@@ -123,7 +123,7 @@ use strict;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 use vars qw(%wratio);
 
-$VERSION = '1.2';
+$VERSION = '1.21';
 require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw(pscolumns);
@@ -133,7 +133,7 @@ sub pscolumns
   my %arg= @_;
   my($now,$who)= (scalar localtime, getlogin);
   ## initial metrics 
-  my($margin_N,$margin_E,$margin_S,$margin_W)= @{$arg{-margins}};
+  my($margin_N,$margin_E,$margin_S,$margin_W)= @{$arg{-margins}||[]};
   $margin_N= 30 unless defined $margin_N;
   $margin_E= 15 unless defined $margin_E;
   $margin_S= $margin_N unless defined $margin_S;
