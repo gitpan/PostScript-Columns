@@ -9,3 +9,10 @@ Revision history for Perl extension PostScript::Columns.
 	- zero-arguments now handled correctly
 	- minor documentaton changes
   - ceil() now performed manually, POSIX no longer used
+1.21 Monday, March 12, 2001
+  - fixed error when no margins given
+1.22 Monday, March 12, 2001
+  - changed L/R margin defaults from 15 to 20 
+  - minor documentation changes
+1.23 Friday, August 03, 2001
+  - added page label (same as number) as per DSC

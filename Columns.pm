@@ -8,7 +8,7 @@ PostScript::Columns - Squeeze a text file into multiple columns.
   use PostScript::ColDoc;
   
   $psdoc= pscolumns( 
-    -margins => [30,15], # NS,EW or N,E,W,S
+    -margins => [30,20], # NSEW or NS,EW or N,EW,S or N,E,W,S (like CSS)
     -headfont => 'NimbusMonL-Bold', 
     -headsize => 12,
     -head => $head,
@@ -57,7 +57,8 @@ Only the monospace PostScript fonts are available:
 
 Array ref that specifies page margins, in I<points> (1/72 of an inch).
 North, East, West South are expressed as
-four elements: [ N, E, S, W ] I<or> two elements [ N_S, E_W ].
+four elements: [ N, E, S, W ], three elements [ N, E_W, S ], two elements [ N_S, E_W ],
+or one element [ N_S_E_W ].
 (This is the same order that CSS uses.)
 
 B<Note:> Different printers may require drastically different margins.
@@ -123,7 +124,7 @@ use strict;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 use vars qw(%wratio);
 
-$VERSION = '1.21';
+$VERSION = '1.23';
 require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw(pscolumns);
@@ -135,7 +136,7 @@ sub pscolumns
   ## initial metrics 
   my($margin_N,$margin_E,$margin_S,$margin_W)= @{$arg{-margins}||[]};
   $margin_N= 30 unless defined $margin_N;
-  $margin_E= 15 unless defined $margin_E;
+  $margin_E= 20 unless defined $margin_E;
   $margin_S= $margin_N unless defined $margin_S;
   $margin_W= $margin_E unless defined $margin_W;
   my $font= ( $wratio{$arg{-font}} ? $arg{-font} : 'NimbusMonL-Regu' );
@@ -236,7 +237,7 @@ sub pscolumns
   {
     $p++;
     (my $thishead= $ps_head)=~ s/\$p\b/$p/g;
-    $ps.= "\n%%Page: $p\n".$thishead;
+    $ps.= "\n%%Page: (Page $p) $p\n".$thishead;
     for my $x (map {$margin_W+$col_X*$_} (0..$cols-1))
     {
       for my $y (map {$text_top-$font_Y*$_} (0..$rows-1))
