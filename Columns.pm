@@ -55,10 +55,13 @@ Only the monospace PostScript fonts are available:
 
 =item -margins
 
-Array ref that specifies page margins.
+Array ref that specifies page margins, in I<points> (1/72 of an inch).
 North, East, West South are expressed as
-four elements: [ N, E, W, S, ] 
-I<or> two elements [ N_S, E_W ].
+four elements: [ N, E, S, W ] I<or> two elements [ N_S, E_W ].
+(This is the same order that CSS uses.)
+
+B<Note:> Different printers may require drastically different margins.
+You'll have to experiment each time you use this module with a new printer.
 
 =item -headfont
 
@@ -106,7 +109,7 @@ and C<$pp> with the total number of pages.
 
 =head1 AUTHOR
 
-Brian Lalonde E<lt>brianl@sd81.k12.wa.usE<gt>
+v, E<lt>five@rant.scriptmania.comE<gt>
 
 =head1 SEE ALSO
 
@@ -117,11 +120,10 @@ perl(1).
 package PostScript::Columns;
 
 use strict;
-use POSIX; # for ceil() 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 use vars qw(%wratio);
 
-$VERSION = '1.10';
+$VERSION = '1.2';
 require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw(pscolumns);
@@ -131,10 +133,11 @@ sub pscolumns
   my %arg= @_;
   my($now,$who)= (scalar localtime, getlogin);
   ## initial metrics 
-  my $margin_N= $arg{-margins}->[0] || 30;
-  my $margin_E= $arg{-margins}->[1] || 15;
-  my $margin_W= $arg{-margins}->[2] || $margin_E;
-  my $margin_S= $arg{-margins}->[3] || $margin_N;
+  my($margin_N,$margin_E,$margin_S,$margin_W)= @{$arg{-margins}};
+  $margin_N= 30 unless defined $margin_N;
+  $margin_E= 15 unless defined $margin_E;
+  $margin_S= $margin_N unless defined $margin_S;
+  $margin_W= $margin_E unless defined $margin_W;
   my $font= ( $wratio{$arg{-font}} ? $arg{-font} : 'NimbusMonL-Regu' );
   my $font_Y= $arg{-size} || 7;
   my $font_X= $font_Y * $wratio{$font};
@@ -180,7 +183,7 @@ sub pscolumns
   my $cols= int( $text_X / $col_X ) || 1;
   $col_X= $text_X / $cols;
   my $pagelines= $rows * $cols;
-  my $pp= ceil( @text / $pagelines );
+  my $pp= int( ( @text / $pagelines ) +0.999 );
   my $ps= <<".";
 %!PS-Adobe-3.0
 %%Title: Columnar Document
